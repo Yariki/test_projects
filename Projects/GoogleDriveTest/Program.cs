@@ -48,14 +48,7 @@ namespace GoogleDriveTest
             
             var filelist = retrieveAllFiles(service,"mimeType = 'application/vnd.google-apps.folder' and name = 'TaskWorkspace'");
             string folderId = string.Empty;
-            if (!filelist.Any())
-            {
-                folderId = CreateFolderAndReturnId(service, "TaskWorkspace");
-            }
-            else
-            {
-                folderId = filelist.First().Id;
-            }
+            folderId = !filelist.Any() ? CreateFolderAndReturnId(service, "TaskWorkspace") : filelist.First().Id;
 
             if (!string.IsNullOrEmpty(folderId))
             {
@@ -85,19 +78,33 @@ namespace GoogleDriveTest
                 var file = request.ResponseBody;
                 Console.WriteLine("File ID: " + file.Id);
 
-                var fileList = retrieveAllFiles(service, $"name = 'WorkspaceManager.vsix.zip'");
-                
+                var fileResp  = service.Files.Get(file.Id);
+
                 //download
 
-                var fileRequested = fileList.First().WebContentLink;
-                
-                MediaDownloader downloader = new MediaDownloader(service);
-                downloader.ProgressChanged += progress => { Console.WriteLine(progress.Exception?.ToString()); };
-                downloader.Download(file.WebContentLink,
-	                System.IO.File.Create("c:/temp/WorkspaceManager.vsix.zip"));
 
-                
+                var memStream = new MemoryStream();
+                fileResp.MediaDownloader.ProgressChanged += progress =>
+                {
+                    switch (progress.Status)
+                    {
+                        case DownloadStatus.Completed:
+                            using (var fileStream = System.IO.File.Create("c:/temp/WorkspaceManager.vsix.zip"))
+                            {
+                                memStream.WriteTo(fileStream);
+                                fileStream.Flush();
+                            }
 
+                            
+                            break;
+                        case DownloadStatus.Failed:
+                            if(progress.Exception != null)
+                                Console.WriteLine(progress.Exception.Message);
+                            break;
+                            
+                    }
+                };
+                fileResp.Download(memStream);
 
             }
             
