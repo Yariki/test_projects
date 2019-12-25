@@ -24,8 +24,8 @@ namespace GoogleDriveTest
                 DriveService.Scope.DriveAppdata
             };
             var clientId =
-                "612213896674-6s8pr9d81vs9js0964tsetap7qjf189i.apps.googleusercontent.com"; // From https://console.developers.google.com
-            var clientSecret = "4TyuYuWszueyEWFlWU-gqYEQ"; // From https://console.developers.google.com
+                "612213896674-cpqjc29rj2sog88ihlk2sd9jribrparq.apps.googleusercontent.com"; // From https://console.developers.google.com
+            var clientSecret = "yHz-xmR2vudvRUmhG5CY3rv0"; // From https://console.developers.google.com
 
             // here is where we Request the user to give us access, or use the Refresh Token that was previously stored in %AppData%
             GoogleWebAuthorizationBroker.Folder = "Drive.Sample";
@@ -66,7 +66,7 @@ namespace GoogleDriveTest
                     Parents = new List<string>() { folderId}
                 };
                 FilesResource.CreateMediaUpload request;
-                using (var stream = new System.IO.FileStream("C:/Users/Yariki/Downloads/WorkspaceManager.vsix.zip",
+                using (var stream = new System.IO.FileStream("C:/Users/ADMIN/Downloads/test.txt",
                                         System.IO.FileMode.Open))
                 {
                     request = service.Files.Create(
